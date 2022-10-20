@@ -1,22 +1,10 @@
 use {
-    anchor_lang::{
-        prelude::*,
-        solana_program::program::invoke,
-        system_program,
-    },
-    anchor_spl::{
-        associated_token,
-        token,
-    },
-    mpl_token_metadata::{
-        ID as TOKEN_METADATA_ID,
-        instruction as token_instruction,
-    },
+    anchor_lang::{prelude::*, solana_program::program::invoke, system_program},
+    anchor_spl::{associated_token, token},
+    mpl_token_metadata::{instruction as token_instruction, ID as TOKEN_METADATA_ID},
 };
 
-
-declare_id!("ApoJnWfacBg3dy84FS8QUt9SE9xyzFaV7x33vcCKPTkd");
-
+declare_id!("Hh28Sxm3HGpEsyqpwuDnJPcays8ZWULoNcNFtr9UjwLc");
 
 #[program]
 pub mod mint_nft {
@@ -25,16 +13,15 @@ pub mod mint_nft {
     use super::*;
 
     pub fn mint(
-        ctx: Context<MintNft>, 
-        metadata_title: String, 
-        metadata_symbol: String, 
+        ctx: Context<MintNft>,
+        metadata_title: String,
+        metadata_symbol: String,
         metadata_uri: String,
-    ) -> Result<()> { 
-
-        msg!("total mint count: {}", ctx.accounts.minting_account.total_mint_count);
+    ) -> Result<()> {
         
         msg!("Creating mint account...");
         msg!("Mint: {}", &ctx.accounts.mint.key());
+        
         system_program::create_account(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -44,12 +31,18 @@ pub mod mint_nft {
                 },
             ),
             //price of nft
-            1*LAMPORTS_PER_SOL/4,
+            1 * LAMPORTS_PER_SOL / 4,
             //space
             82,
             //owner
             &ctx.accounts.token_program.key(),
         )?;
+
+        //let mut _count = ctx.accounts.minting_account.total_mint_count.clone();
+        //let counter = &mut ctx.accounts.minting_account;
+        // counter.total_mint_count += 1;
+
+       // msg!("total mint count {}: ",  counter.total_mint_count);
 
         msg!("Initializing mint account...");
         msg!("Mint: {}", &ctx.accounts.mint.key());
@@ -67,25 +60,23 @@ pub mod mint_nft {
         )?;
 
         msg!("Creating token account...");
-        msg!("Token Address: {}", &ctx.accounts.token_account.key());    
-        associated_token::create(
-            CpiContext::new(
-                ctx.accounts.associated_token_program.to_account_info(),
-                associated_token::Create {
-                    payer: ctx.accounts.mint_authority.to_account_info(),
-                    associated_token: ctx.accounts.token_account.to_account_info(),
-                    authority: ctx.accounts.mint_authority.to_account_info(),
-                    mint: ctx.accounts.mint.to_account_info(),
-                    system_program: ctx.accounts.system_program.to_account_info(),
-                    token_program: ctx.accounts.token_program.to_account_info(),
-                    rent: ctx.accounts.rent.to_account_info(),
-                },
-            ),
-        )?;
+        msg!("Token Address: {}", &ctx.accounts.token_account.key());
+        associated_token::create(CpiContext::new(
+            ctx.accounts.associated_token_program.to_account_info(),
+            associated_token::Create {
+                payer: ctx.accounts.mint_authority.to_account_info(),
+                associated_token: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.mint_authority.to_account_info(),
+                mint: ctx.accounts.mint.to_account_info(),
+                system_program: ctx.accounts.system_program.to_account_info(),
+                token_program: ctx.accounts.token_program.to_account_info(),
+                rent: ctx.accounts.rent.to_account_info(),
+            },
+        ))?;
 
         msg!("Minting token to token account...");
-        msg!("Mint: {}", &ctx.accounts.mint.to_account_info().key());   
-        msg!("Token Address: {}", &ctx.accounts.token_account.key());     
+        msg!("Mint: {}", &ctx.accounts.mint.to_account_info().key());
+        msg!("Token Address: {}", &ctx.accounts.token_account.key());
         token::mint_to(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -99,23 +90,26 @@ pub mod mint_nft {
         )?;
 
         msg!("Creating metadata account...");
-        msg!("Metadata account address: {}", &ctx.accounts.metadata.to_account_info().key());
+        msg!(
+            "Metadata account address: {}",
+            &ctx.accounts.metadata.to_account_info().key()
+        );
         invoke(
             &token_instruction::create_metadata_accounts_v2(
-                TOKEN_METADATA_ID, 
-                ctx.accounts.metadata.key(), 
-                ctx.accounts.mint.key(), 
-                ctx.accounts.mint_authority.key(), 
-                ctx.accounts.mint_authority.key(), 
-                ctx.accounts.mint_authority.key(), 
-                metadata_title, 
-                metadata_symbol, 
-                metadata_uri, 
+                TOKEN_METADATA_ID,
+                ctx.accounts.metadata.key(),
+                ctx.accounts.mint.key(),
+                ctx.accounts.mint_authority.key(),
+                ctx.accounts.mint_authority.key(),
+                ctx.accounts.mint_authority.key(),
+                metadata_title,
+                metadata_symbol,
+                metadata_uri,
                 None,
                 1,
-                true, 
-                false, 
-                None, 
+                true,
+                false,
+                None,
                 None,
             ),
             &[
@@ -128,16 +122,19 @@ pub mod mint_nft {
         )?;
 
         msg!("Creating master edition metadata account...");
-        msg!("Master edition metadata account address: {}", &ctx.accounts.master_edition.to_account_info().key());
+        msg!(
+            "Master edition metadata account address: {}",
+            &ctx.accounts.master_edition.to_account_info().key()
+        );
         invoke(
             &token_instruction::create_master_edition_v3(
-                TOKEN_METADATA_ID, 
-                ctx.accounts.master_edition.key(), 
-                ctx.accounts.mint.key(), 
-                ctx.accounts.mint_authority.key(), 
-                ctx.accounts.mint_authority.key(), 
-                ctx.accounts.metadata.key(), 
-                ctx.accounts.mint_authority.key(), 
+                TOKEN_METADATA_ID,
+                ctx.accounts.master_edition.key(),
+                ctx.accounts.mint.key(),
+                ctx.accounts.mint_authority.key(),
+                ctx.accounts.mint_authority.key(),
+                ctx.accounts.metadata.key(),
+                ctx.accounts.mint_authority.key(),
                 Some(0),
             ),
             &[
@@ -151,16 +148,28 @@ pub mod mint_nft {
         )?;
 
         msg!("Token mint process completed successfully.");
-        ctx.accounts.minting_account.total_mint_count += 1;
-        msg!("mint count: {}", ctx.accounts.minting_account.total_mint_count);
+        // ctx.accounts.minting_account.total_mint_count += 1;
+        // msg!(
+        //     "mint count: {}",
+        //     ctx.accounts.minting_account.total_mint_count
+        // );
         Ok(())
     }
 }
 
 #[derive(Accounts)]
 pub struct MintNft<'info> {
-    #[account(mut)]
-    pub minting_account: Box<Account<'info, MintingAccount>>,
+
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    // #[account(
+    //         mut,
+    //         seeds = [b"customseed".as_ref() ],
+    //         bump,
+    //         //constraint = ! minting_account.freeze_program,
+    //         )]
+    
+    // #[account(mut)]
+    // pub payer: Signer<'info>,
 
     /// CHECK: We're about to create this with Metaplex
     #[account(mut)]
@@ -171,7 +180,7 @@ pub struct MintNft<'info> {
     #[account(mut)]
     pub mint: Signer<'info>,
     /// CHECK: We're about to create this with Anchor
-    #[account(mut)]
+    #[account(mut)]  
     pub token_account: UncheckedAccount<'info>,
     #[account(mut)]
     pub mint_authority: Signer<'info>,
@@ -181,11 +190,19 @@ pub struct MintNft<'info> {
     pub associated_token_program: Program<'info, associated_token::AssociatedToken>,
     /// CHECK: Metaplex will check this
     pub token_metadata_program: UncheckedAccount<'info>,
+
+    // #[account(init, payer=mint_authority, space=5000)]
+    #[account(
+        init,
+        payer=mint,
+        //seeds = [b"breaking_news"],
+        space=5000,
+        //bump,
+    )]
+    pub minting_account: Account<'info, MintingAccount>,
 }
 
-
 #[account]
-#[derive(Default)]
 pub struct MintingAccount {
     pub total_mint_count: u64,
 }

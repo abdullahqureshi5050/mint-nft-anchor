@@ -19,9 +19,9 @@ describe("nft-marketplace", async () => {
   //   new anchor.web3.PublicKey("H2UJjAQTuVJYhaBhh6GD2KaprLBTp1vhP2aaHioya5NM"),
   // );
   // ** Comment this to use solpg imported IDL **
-  const program = anchor.workspace.MintNft as anchor.Program<MintNft>;
+  const program = await anchor.workspace.MintNft as anchor.Program<MintNft>;
 
-  const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
+  const TOKEN_METADATA_PROGRAM_ID = await new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
   );
 
@@ -30,7 +30,7 @@ describe("nft-marketplace", async () => {
 
     // Derive the mint address and the associated token account address
 
-    const mintKeypair: anchor.web3.Keypair = anchor.web3.Keypair.generate();
+    const mintKeypair: anchor.web3.Keypair = await anchor.web3.Keypair.generate();
     const tokenAddress = await anchor.utils.token.associatedAddress({
       mint: mintKeypair.publicKey,
       owner: wallet.publicKey
@@ -59,20 +59,32 @@ describe("nft-marketplace", async () => {
     ))[0];
     console.log("Master edition metadata initialized");
 
+    // try {
+    //   const account = await program.methods.
+    // } catch (error) {
+      
+    // }
+
     // Transact with the "mint" function in our on-chain program
-    
-    await program.methods.mint(
-      testNftTitle, testNftSymbol, testNftUri
-    )
-    .accounts({
-      masterEdition: masterEditionAddress,
-      metadata: metadataAddress,
-      mint: mintKeypair.publicKey,
-      tokenAccount: tokenAddress,
-      mintAuthority: wallet.publicKey,
-      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-    })
-    .signers([mintKeypair])
-    .rpc();
+    try {
+      const account = await program.methods.mint(
+        testNftTitle, testNftSymbol, testNftUri
+      )
+      .accounts({
+        masterEdition: masterEditionAddress,
+        metadata: metadataAddress,
+        mint: mintKeypair.publicKey,
+        tokenAccount: tokenAddress,
+        mintAuthority: wallet.publicKey,
+        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+        mintingAccount:  wallet.publicKey,
+      })
+      .signers([mintKeypair])
+      .rpc();  
+      console.log(`Account ===`, account);
+    } catch (error) {
+      console.error(`Error ===`, error);
+    }
+ 
   });
 });
