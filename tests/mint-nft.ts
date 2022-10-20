@@ -25,12 +25,27 @@ describe("nft-marketplace", async () => {
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
   );
 
+  async function mintingAccountPDA(pk: anchor.web3.PublicKey){
+    const [pda, _ ] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        pk.toBuffer(),
+        Buffer.from("minting_account")],program.programId);
+    return pda;
+  }
 
   it("Mint!", async () => {
 
     // Derive the mint address and the associated token account address
 
     const mintKeypair: anchor.web3.Keypair = await anchor.web3.Keypair.generate();
+    const tx = await provider.connection.requestAirdrop(mintKeypair.publicKey, 2 * anchor.web3.LAMPORTS_PER_SOL);
+    await provider.connection.confirmTransaction(tx);
+    await new Promise(resolve => {
+      setTimeout(resolve, 1000);
+    });
+
+    let mintingPDA = await mintingAccountPDA(mintKeypair.publicKey);
+
     const tokenAddress = await anchor.utils.token.associatedAddress({
       mint: mintKeypair.publicKey,
       owner: wallet.publicKey
@@ -66,7 +81,8 @@ describe("nft-marketplace", async () => {
     // }
 
     // Transact with the "mint" function in our on-chain program
-    try {
+    
+    // try {
       const account = await program.methods.mint(
         testNftTitle, testNftSymbol, testNftUri
       )
@@ -77,14 +93,14 @@ describe("nft-marketplace", async () => {
         tokenAccount: tokenAddress,
         mintAuthority: wallet.publicKey,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        mintingAccount:  wallet.publicKey,
+        mintingAccount:  mintingPDA,
       })
       .signers([mintKeypair])
       .rpc();  
       console.log(`Account ===`, account);
-    } catch (error) {
-      console.error(`Error ===`, error);
-    }
+    // } catch (error) {
+    //   console.error(`Error ===`, error);
+    // }
  
   });
 });

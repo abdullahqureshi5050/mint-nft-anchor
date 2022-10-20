@@ -4,7 +4,7 @@ use {
     mpl_token_metadata::{instruction as token_instruction, ID as TOKEN_METADATA_ID},
 };
 
-declare_id!("Hh28Sxm3HGpEsyqpwuDnJPcays8ZWULoNcNFtr9UjwLc");
+declare_id!("ApoJnWfacBg3dy84FS8QUt9SE9xyzFaV7x33vcCKPTkd");
 
 #[program]
 pub mod mint_nft {
@@ -39,7 +39,7 @@ pub mod mint_nft {
         )?;
 
         //let mut _count = ctx.accounts.minting_account.total_mint_count.clone();
-        //let counter = &mut ctx.accounts.minting_account;
+        // let counter = &mut ctx.accounts.minting_account;
         // counter.total_mint_count += 1;
 
        // msg!("total mint count {}: ",  counter.total_mint_count);
@@ -195,9 +195,9 @@ pub struct MintNft<'info> {
     #[account(
         init,
         payer=mint,
-        //seeds = [b"breaking_news"],
-        space=5000,
-        //bump,
+        seeds = [mint.key().as_ref(), b"minting_account"],
+        space=82,
+        bump,
     )]
     pub minting_account: Account<'info, MintingAccount>,
 }
