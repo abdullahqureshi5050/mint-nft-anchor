@@ -158,19 +158,20 @@ pub mod mint_nft {
 }
 
 #[derive(Accounts)]
-#[instruction()]
+#[instruction(bump: u8)]
 pub struct MintNft<'info> {
-
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    // #[account(
-    //         mut,
-    //         seeds = [b"customseed".as_ref() ],
-    //         bump,
-    //         //constraint = ! minting_account.freeze_program,
-    //         )]
-    
-    // #[account(mut)]
-    // pub payer: Signer<'info>,
+   
+    #[account(
+        init,
+        payer=mint,
+        space=82,
+        seeds = [
+            mint.key().as_ref(),
+            b"minting_account"
+            ],
+        bump,
+    )]
+    pub minting_pda: Account<'info, MintingAccount>,
 
     /// CHECK: We're about to create this with Metaplex
     #[account(mut)]
@@ -192,20 +193,9 @@ pub struct MintNft<'info> {
     /// CHECK: Metaplex will check this
     pub token_metadata_program: UncheckedAccount<'info>,
 
-    // #[account(init, payer=mint_authority, space=5000)]
-
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(
-        init,
-        payer=mint,
-        seeds = [b"minting_account"],
-        space=82,
-        bump,
-    )]
-    pub minting_account: Account<'info, MintingAccount>,
 }
 
 #[account]
 pub struct MintingAccount {
-    pub total_mint_count: u32,
+    pub count: u32,
 }

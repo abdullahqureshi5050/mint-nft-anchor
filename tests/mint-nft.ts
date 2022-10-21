@@ -32,21 +32,6 @@ describe("nft-marketplace", async () => {
   //       [Buffer.from(anchor.utils.bytes.utf8.encode("breaking_news"))],
   //       program.programId);
 
-  async function mintingAccountPDA(pk: anchor.web3.PublicKey) {
-    // const [pda, _] = await anchor.web3.PublicKey.findProgramAddress(
-    //   [
-    //     pk.toBuffer(),
-    //     Buffer.from("minting_account")
-    //   ], program.programId);
-
-    const [_mintingAccount, _mintingAccountbump] =
-      await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from(anchor.utils.bytes.utf8.encode("minting_account"))],
-        program.programId);
-
-    return _mintingAccount;
-  }
-
   it("Mint!", async () => {
 
     // Derive the mint address and the associated token account address
@@ -58,8 +43,23 @@ describe("nft-marketplace", async () => {
       setTimeout(resolve, 1000);
     });
 
+    async function mintingAccountPDA(pk: anchor.web3.PublicKey) {
+      const [_mintingAccount, _mintingAccountbump] = await anchor.web3.PublicKey.findProgramAddress(
+        [
+          pk.toBuffer(),
+          Buffer.from("minting_account"),
+        ], program.programId);
+  
+      // const [_mintingAccount, _mintingAccountbump] =
+      //   await anchor.web3.PublicKey.findProgramAddress(
+      //     [Buffer.from(anchor.utils.bytes.utf8.encode("minting_account"))],
+      //     program.programId);
+  
+      return _mintingAccount;
+    }
+
     let mintingPDA = await mintingAccountPDA(mintKeypair.publicKey);
-    console.warn("PPPPPPPPPPPDDDDDDDDDDDDDddAAAAAAAAAA", mintingPDA);
+
     const tokenAddress = await anchor.utils.token.associatedAddress({
       mint: mintKeypair.publicKey,
       owner: wallet.publicKey
@@ -77,6 +77,7 @@ describe("nft-marketplace", async () => {
       ],
       TOKEN_METADATA_PROGRAM_ID
     ))[0];
+
     console.log("Metadata initialized");
     const masterEditionAddress = (await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -108,13 +109,15 @@ describe("nft-marketplace", async () => {
         tokenAccount: tokenAddress,
         mintAuthority: wallet.publicKey,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        mintingAccount: mintingPDA,
+        mintingPda: mintingPDA,
       })
       .signers([mintKeypair])
       .rpc();
     console.log(`Account ===`, account);
      } catch (error) {
-      console.error(`Error ===`, error);
+      //console.error(`Error ===`, error);
+      throw new Error(error);
+      
      }
   });
 });
