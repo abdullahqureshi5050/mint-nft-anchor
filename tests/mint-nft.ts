@@ -14,23 +14,26 @@ describe("nft-marketplace", async () => {
   const wallet = provider.wallet as anchor.Wallet;
   anchor.setProvider(provider);
 
-  // ** Un-comment this to use solpg imported IDL **
-  // const program = new anchor.Program(
-  //   require("../solpg/idl.json"), 
-  //   new anchor.web3.PublicKey("H2UJjAQTuVJYhaBhh6GD2KaprLBTp1vhP2aaHioya5NM"),
-  // );
-  // ** Comment this to use solpg imported IDL **
   const program = await anchor.workspace.MintNft as anchor.Program<MintNft>;
 
   const TOKEN_METADATA_PROGRAM_ID = await new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
   );
 
+  async function mintingAccountPDA(pk: anchor.web3.PublicKey) {
+    // const [pda, _] = await anchor.web3.PublicKey.findProgramAddress(
+    //   [
+    //     pk.toBuffer(),
+    //     Buffer.from("minting_account")
+    //   ], program.programId);
 
-  // const [_mintingAccount, _mintingAccountbump] =
-  //     await anchor.web3.PublicKey.findProgramAddress(
-  //       [Buffer.from(anchor.utils.bytes.utf8.encode("breaking_news"))],
-  //       program.programId);
+    const [_mintingAccount, _mintingAccountbump] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [Buffer.from(anchor.utils.bytes.utf8.encode("minting_account"))],
+        program.programId);
+
+    return _mintingAccount;
+  }
 
   it("Mint!", async () => {
 
@@ -43,23 +46,7 @@ describe("nft-marketplace", async () => {
       setTimeout(resolve, 1000);
     });
 
-    async function mintingAccountPDA(pk: anchor.web3.PublicKey) {
-      const [_mintingAccount, _mintingAccountbump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-          pk.toBuffer(),
-          Buffer.from("minting_account"),
-        ], program.programId);
-  
-      // const [_mintingAccount, _mintingAccountbump] =
-      //   await anchor.web3.PublicKey.findProgramAddress(
-      //     [Buffer.from(anchor.utils.bytes.utf8.encode("minting_account"))],
-      //     program.programId);
-  
-      return _mintingAccount;
-    }
-
     let mintingPDA = await mintingAccountPDA(mintKeypair.publicKey);
-
     const tokenAddress = await anchor.utils.token.associatedAddress({
       mint: mintKeypair.publicKey,
       owner: wallet.publicKey
@@ -77,7 +64,6 @@ describe("nft-marketplace", async () => {
       ],
       TOKEN_METADATA_PROGRAM_ID
     ))[0];
-
     console.log("Metadata initialized");
     const masterEditionAddress = (await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -89,12 +75,6 @@ describe("nft-marketplace", async () => {
       TOKEN_METADATA_PROGRAM_ID
     ))[0];
     console.log("Master edition metadata initialized");
-
-    // try {
-    //   const account = await program.methods.
-    // } catch (error) {
-
-    // }
 
     // Transact with the "mint" function in our on-chain program
 
@@ -109,15 +89,13 @@ describe("nft-marketplace", async () => {
         tokenAccount: tokenAddress,
         mintAuthority: wallet.publicKey,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        mintingPda: mintingPDA,
+        mintingPda: mintingPDA
       })
-      .signers([mintKeypair])
+      .signers([mintKeypair, wallet.payer])
       .rpc();
     console.log(`Account ===`, account);
      } catch (error) {
-      //console.error(`Error ===`, error);
-      throw new Error(error);
-      
+      console.error(`Error ===`, error);
      }
   });
 });

@@ -38,9 +38,9 @@ pub mod mint_nft {
             &ctx.accounts.token_program.key(),
         )?;
 
-        //let mut _count = ctx.accounts.minting_account.total_mint_count.clone();
-        // let counter = &mut ctx.accounts.minting_account;
-        // counter.total_mint_count += 1;
+        //let mut _count = ctx.accounts.minting_pda.count.clone();
+        let counter = &mut ctx.accounts.minting_pda;
+        counter.count += 1;
 
        // msg!("total mint count {}: ",  counter.total_mint_count);
 
@@ -162,11 +162,11 @@ pub mod mint_nft {
 pub struct MintNft<'info> {
    
     #[account(
-        init,
+        init_if_needed,
         payer=mint,
         space=82,
         seeds = [
-            mint.key().as_ref(),
+           // mint.key().as_ref(),
             b"minting_account"
             ],
         bump,
