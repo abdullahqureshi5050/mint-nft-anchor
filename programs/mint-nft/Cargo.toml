@@ -22,3 +22,4 @@ overflow-checks = true
 anchor-lang = "0.24.2"
 mpl-token-metadata = { version="1.2.5", features = [ "no-entrypoint" ] }
 anchor-spl = "0.24.2"
+#anchor-lang = {git = "https://github.com/project-serum/anchor", tag = "v0.24.2", features = ["init-if-needed"]}

@@ -4,7 +4,7 @@ use {
     mpl_token_metadata::{instruction as token_instruction, ID as TOKEN_METADATA_ID},
 };
 
-declare_id!("4LhpdU2pB1vzNuci6EH96gYf2mKgMtn3EtzY8HgchCDn");
+declare_id!("Hh28Sxm3HGpEsyqpwuDnJPcays8ZWULoNcNFtr9UjwLc");
 
 #[program]
 pub mod mint_nft {
@@ -198,7 +198,7 @@ pub struct MintNft<'info> {
     #[account(
         init,
         payer=mint,
-        seeds = [mint.key().as_ref(), b"minting_account"],
+        seeds = [b"minting_account"],
         space=82,
         bump,
     )]
