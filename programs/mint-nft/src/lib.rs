@@ -4,7 +4,7 @@ use {
     mpl_token_metadata::{instruction as token_instruction, ID as TOKEN_METADATA_ID},
 };
 
-declare_id!("ApoJnWfacBg3dy84FS8QUt9SE9xyzFaV7x33vcCKPTkd");
+declare_id!("4LhpdU2pB1vzNuci6EH96gYf2mKgMtn3EtzY8HgchCDn");
 
 #[program]
 pub mod mint_nft {
@@ -158,6 +158,7 @@ pub mod mint_nft {
 }
 
 #[derive(Accounts)]
+#[instruction()]
 pub struct MintNft<'info> {
 
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -192,6 +193,8 @@ pub struct MintNft<'info> {
     pub token_metadata_program: UncheckedAccount<'info>,
 
     // #[account(init, payer=mint_authority, space=5000)]
+
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(
         init,
         payer=mint,
@@ -204,5 +207,5 @@ pub struct MintNft<'info> {
 
 #[account]
 pub struct MintingAccount {
-    pub total_mint_count: u64,
+    pub total_mint_count: u32,
 }

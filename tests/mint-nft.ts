@@ -45,7 +45,7 @@ describe("nft-marketplace", async () => {
     });
 
     let mintingPDA = await mintingAccountPDA(mintKeypair.publicKey);
-
+    console.warn("PPPPPPPPPPPDDDDDDDDDDDDDddAAAAAAAAAA", mintingPDA); 
     const tokenAddress = await anchor.utils.token.associatedAddress({
       mint: mintKeypair.publicKey,
       owner: wallet.publicKey
@@ -101,6 +101,5 @@ describe("nft-marketplace", async () => {
     // } catch (error) {
     //   console.error(`Error ===`, error);
     // }
- 
   });
 });
