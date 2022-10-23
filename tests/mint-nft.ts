@@ -40,11 +40,14 @@ describe("nft-marketplace", async () => {
     // Derive the mint address and the associated token account address
 
     const mintKeypair: anchor.web3.Keypair = await anchor.web3.Keypair.generate();
-    const tx = await provider.connection.requestAirdrop(mintKeypair.publicKey, 2 * anchor.web3.LAMPORTS_PER_SOL);
-    await provider.connection.confirmTransaction(tx);
-    await new Promise(resolve => {
-      setTimeout(resolve, 1000);
-    });
+    // await new Promise(resolve => {
+    //   setTimeout(resolve, 13000);
+    // });
+    // console.log(`called 1`);
+    // const tx = await provider.connection.requestAirdrop(mintKeypair.publicKey, 2 * anchor.web3.LAMPORTS_PER_SOL);
+    // console.log(`called 2`);
+    // await provider.connection.confirmTransaction(tx);
+    // console.log(`called 3`);
 
     let mintingPDA = await mintingAccountPDA(mintKeypair.publicKey);
     const tokenAddress = await anchor.utils.token.associatedAddress({
@@ -89,9 +92,9 @@ describe("nft-marketplace", async () => {
         tokenAccount: tokenAddress,
         mintAuthority: wallet.publicKey,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        mintingPda: mintingPDA
+        //mintingPda: mintingPDA
       })
-      .signers([mintKeypair, wallet.payer])
+      .signers([ mintKeypair])
       .rpc();
     console.log(`Account ===`, account);
      } catch (error) {

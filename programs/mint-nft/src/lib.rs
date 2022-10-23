@@ -4,7 +4,7 @@ use {
     mpl_token_metadata::{instruction as token_instruction, ID as TOKEN_METADATA_ID},
 };
 
-declare_id!("Hh28Sxm3HGpEsyqpwuDnJPcays8ZWULoNcNFtr9UjwLc");
+declare_id!("CFr8NYECTb3qMViTJHEXVTVkgs3c3XYg3VkmemECEEo4");
 
 #[program]
 pub mod mint_nft {
@@ -39,8 +39,8 @@ pub mod mint_nft {
         )?;
 
         //let mut _count = ctx.accounts.minting_pda.count.clone();
-        let counter = &mut ctx.accounts.minting_pda;
-        counter.count += 1;
+        // let counter = &mut ctx.accounts.minting_pda;
+        // counter.count += 1;
 
        // msg!("total mint count {}: ",  counter.total_mint_count);
 
@@ -161,17 +161,17 @@ pub mod mint_nft {
 #[instruction(bump: u8)]
 pub struct MintNft<'info> {
    
-    #[account(
-        init_if_needed,
-        payer=mint,
-        space=82,
-        seeds = [
-           // mint.key().as_ref(),
-            b"minting_account"
-            ],
-        bump,
-    )]
-    pub minting_pda: Account<'info, MintingAccount>,
+    // #[account(
+    //     init_if_needed,
+    //     payer=mint,
+    //     space=82,
+    //     seeds = [
+    //        // mint.key().as_ref(),
+    //         b"minting_account"
+    //         ],
+    //     bump,
+    // )]
+    // pub minting_pda: Account<'info, MintingAccount>,
 
     /// CHECK: We're about to create this with Metaplex
     #[account(mut)]
