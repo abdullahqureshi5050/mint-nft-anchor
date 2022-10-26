@@ -9,11 +9,18 @@ describe("nft-marketplace", async () => {
   const testNftTitle = "Abdullah'sNFT";
   const testNftSymbol = "MAQ";
   const testNftUri = "https://cockadoodle.mypinata.cloud/ipfs/QmUySHfLXqrzko2cLV5FbbsoD146o3RypTS8NuBc8vYoqU/1.json";
-
-  const provider = anchor.AnchorProvider.env()
-  const wallet = provider.wallet as anchor.Wallet;
-  anchor.setProvider(provider);
-
+  let provider = null;
+  let wallet = null;
+  try {
+    provider = anchor.AnchorProvider.env()
+    wallet = provider.wallet as anchor.Wallet;
+    anchor.setProvider(provider);
+  
+  } catch (error) {
+    console.log(error);
+  } 
+  
+  
   const program = await anchor.workspace.MintNft as anchor.Program<MintNft>;
 
   const TOKEN_METADATA_PROGRAM_ID = await new anchor.web3.PublicKey(
